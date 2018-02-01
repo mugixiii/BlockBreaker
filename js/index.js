@@ -19,7 +19,7 @@ function Ball() {
 	this.dy = 0;
 	this.r = 10;
 	this.dir = 0;
-	this.speed = 10;
+	this.speed = 5;
 	
 	this.move = function() {
 		this.x += this.dx;
@@ -35,8 +35,6 @@ function Ball() {
 	this.draw = function(ctx) {
 		drawBall(this.x, this.y, this.r);
 	}
-	
-	console.log("ballx = " + this.x + "; bally = " + this.y + "; ballr = " + this.r);
 }
 
 Block.prototype = Paddle.prototype = {
@@ -96,7 +94,7 @@ function toggleKey(code, flag) {
 			break;
 		case 32:
 			if (!isPlaying()) {
-				ball.x = paddle.x + paddle.y / 2;
+				ball.x = paddle.x + (paddle.w / 2 - ball.r);
 				ball.y = paddle.y - ball.r;
 				ball.changeDir(Math.random() * Math.PI / 2 + Math.PI / 4);
 			}
@@ -131,6 +129,22 @@ function mainLoop() {
 		return;
 	}
 	
+	if (paddle.x < ball.x && paddle.x + paddle.w > ball.x &&
+		paddle.y - ball.r < ball.y) {
+		var ratio = (paddle.x + paddle.w / 2 - ball.x) / paddle.w * 0.8;
+		ball.changeDir(Math.PI / 2 + Math.PI * ratio);
+	} else if (ball.y >= HEIGHT + 2) {
+		if (--balls == 0) {
+			clearInterval(timer);
+			timer = NaN;
+			draw();
+			return;
+		}
+
+		ball.y = HEIGHT + ball.r;
+	}
+	
+	/*
 	if (ball.y > HEIGHT - paddle.h) {
 		if (paddle.x < ball.x && paddle.x + paddle.w > ball.x &&
 		    paddle.y < ball.y && paddle.y + paddle.h > ball.y) {
@@ -147,7 +161,7 @@ function mainLoop() {
 			ball.y = HEIGHT + ball.r;
 		}
 	}
-	
+	*/
 	var nx = ball.x + ball.dx;
 	var ny = ball.y + ball.dy;
 	
@@ -175,6 +189,7 @@ function mainLoop() {
 		
 		if (blocks.length <= 0) {
 			ball.y = HEIGHT + ball.r;
+			ball.speed++;
 			start();
 			return;
 		}
@@ -207,14 +222,11 @@ function draw() {
 	paddle.draw(ctx);
 	
 	ball.draw(ctx);
-	if (balls > 2) {
-		drawBall(80, 15, 10);
-	}
 	
-	if (balls > 1) {
-		drawBall(50, 15, 10);
+	for (var i = 0; i < balls - 1; i++) {
+		drawBall(50 + 30 * i, 15, 10);
 	}
-	
+
 	ctx.fillStyle = 'rgb(0, 255, 0)';
 	ctx.fillText(('00000' + score).slice(-5), 500, 30);
 
