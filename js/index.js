@@ -16,9 +16,12 @@ var HEIGHT = 600;
 var row = 6;
 var column = 9;
 
-var colors = ['red', 'orange', 'yellow', 'green', 'purple', 'blue'];
-
+var colors = ['red', 'orange', 'yellow', 'green', 'purple', 'blue', 'aqua', 'white'];
 var canvas = document.getElementsByTagName('canvas');
+
+window.addEventListener("load", function() {
+	init(WIDTH, HEIGHT);
+});
 
 function Ball() {
 	this.x = 0;
@@ -70,8 +73,11 @@ function Paddle() {
 	this.keyR = false;
 }
 
-function init() {
-	ctx = document.getElementById('canvas').getContext('2d');
+function init(width, height) {
+	canvas[0].width = width;
+	canvas[0].height = height;
+	
+	ctx = canvas[0].getContext('2d');
 	ctx.font = "20pt Arial";
 	
 	window.addEventListener('keydown', function(e) {
@@ -112,13 +118,19 @@ function toggleKey(code, flag) {
 
 function start() {
 	if (level > 5 && level <= 10) {
-		WIDTH = 785;
-		canvas[0].width = WIDTH;
+		row = 8;
+	} else if (level > 10 && level <= 15) {
+		canvas[0].width = WIDTH = 785;
 		column = 12;
-	} else if (level > 10) {
-		WIDTH = 1025;
-		canvas[0].width = WIDTH;
+		row = 6;
+	} else if (level > 15 && level <= 20) {
+		row = 8;
+	} else if (level > 20 && level <= 25) {
+		canvas[0].width = WIDTH = 1025;
 		column = 16;
+		row = 6;
+	} else if (level > 25) {
+		row = 8;
 	}
 	
 	paddle.w = Math.max(20, paddle.w - 10);
@@ -162,6 +174,7 @@ function mainLoop() {
 		}
 
 		ball.y = HEIGHT + ball.r;
+		combo = 0;
 	}
 	
 	var nx = ball.x + ball.dx;
@@ -270,7 +283,7 @@ function draw() {
 	ball.draw(ctx);
 	
 	if (balls <= 5) {
-		for (var i = 0; i < balls; i++) {
+		for (var i = 0; i < balls - 1; i++) {
 			drawBall(50 + 30 * i, 20, 10);
 		}
 	} else {
@@ -284,6 +297,6 @@ function draw() {
 
 	if (isNaN(timer)) {
 		ctx.fillStyle = 'rgb(255, 0, 0)';
-		ctx.fillText('GAME OVER', (WIDTH - 80), 250);
+		ctx.fillText('GAME OVER', (WIDTH / 2 - 80), 250);
 	}
 }
